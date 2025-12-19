@@ -6,19 +6,20 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    # Port mapping: Host:Container
     ports:
       - "8080:80"
-    restart: always
+    restart: unless-stopped
     networks:
       - devops-network
-    environment:
-      - NODE_ENV=production
+    # Use healthcheck definition from Dockerfile
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
       timeout: 10s
       retries: 3
 
+# Define custom bridge network for service isolation
 networks:
   devops-network:
     driver: bridge

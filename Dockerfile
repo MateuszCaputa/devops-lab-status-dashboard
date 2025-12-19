@@ -1,23 +1,24 @@
-# BASE IMAGE: Use lightweight Nginx on Alpine Linux for production performance
+# Base image: Use lightweight Nginx on Alpine Linux for production performance
 FROM nginx:alpine-slim
 
-# METADATA
-LABEL maintainer="DevOps Engineer"
-LABEL description="Lightweight Nginx server for Status Dashboard"
+# Metadata standards
+LABEL maintainer="Mateusz Caputa"
+LABEL version="1.0.0"
+LABEL description="Nginx-based status dashboard"
 
-# CLEANUP: Remove default Nginx static files to avoid confusion
+# Remove default Nginx static assets
 RUN rm -rf /usr/share/nginx/html/*
 
-# INSTALLATION: Copy our source code to Nginx web root directory
+# Deploy application artifacts
 COPY src/ /usr/share/nginx/html/
 
-# SECURITY: Healthcheck ensures the container is actually processing requests
-# If curl fails (exit 1), Docker will mark container as 'unhealthy'
-HEALTHCHECK --interval=30s --timeout=3s \
+# Healthcheck configuration for container orchestrators
+# Ensures the web server is responsive, not just running
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
   CMD curl -f http://localhost/ || exit 1
 
-# NETWORKING: Document that the container listens on port 80
+# Expose standard HTTP port
 EXPOSE 80
 
-# EXECUTION: Start Nginx in foreground mode (required for containers)
+# Start Nginx in foreground mode
 CMD ["nginx", "-g", "daemon off;"]

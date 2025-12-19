@@ -3,11 +3,12 @@ kind: Service
 metadata:
   name: dashboard-service
 spec:
-  # TRAFFIC DISTRIBUTION: LoadBalancer distributes traffic across all replicas
+  # Expose service externally (Localhost/Cloud IP)
   type: LoadBalancer
   selector:
+    # Traffic routing target
     app: devops-dashboard
   ports:
     - protocol: TCP
-      port: 80 # Port exposed to the cluster/world
-      targetPort: 80 # Port inside the container
+      port: 80
+      targetPort: 80

@@ -1,6 +1,5 @@
 name: CI Pipeline
 
-# Runs on push to main branch and every Pull Request
 on:
   push:
     branches: ["main"]
@@ -9,29 +8,26 @@ on:
 
 jobs:
   build-and-test:
-    name: Build and Test Docker Image
-    runs-on: ubuntu-latest # Use GitHub's hosted Linux runner
+    name: Build, Test & Verify
+    runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code from the repository
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Setup Docker environment
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 3. Build the Docker image
       - name: Build Docker Image
-        run: docker build -t my-app:test .
+        # Build image using local context
+        run: docker build -t app:test .
 
-      # 4. Run the container temporarily to test it
-      - name: Run Container
-        run: docker run -d -p 8080:80 --name test-container my-app:test
+      - name: Run Temporary Container
+        # Run detached container for integration testing
+        run: docker run -d -p 8080:80 --name test-container app:test
 
-      # 5. TEST: Wait for Nginx to start and check response
-      # If 'grep' doesn't find "System Status", the pipeline fails
-      - name: Verify Application is Running
+      - name: Execute Health Check
+        # Wait for Nginx to initialize and verify HTTP response content
         run: |
           sleep 5
           curl -f http://localhost:8080 | grep "System Status"
